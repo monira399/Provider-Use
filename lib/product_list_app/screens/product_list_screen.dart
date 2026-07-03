@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:my_provider/product_list_app/screens/cart_list_screen.dart';
 import 'package:my_provider/provider/product_list_provider.dart';
+import 'package:my_provider/provider/theme_provider.dart';
 import 'package:provider/provider.dart';
 
 import '../../models/product_model.dart';
@@ -67,7 +68,11 @@ class _ProductListScreenState extends State<ProductListScreen> {
                       },
                       child: Text(alreadyInCart ? 'Remove' : 'Add To Cart'),
                     ),
-                  ],
+                SizedBox(height: 20,),
+                   IconButton(onPressed: (){
+                     context.read<ThemeProvider>().toggleThemeMode();
+                   }, icon: Icon(Icons.sunny))
+                  ]
                 ),
               );
             },

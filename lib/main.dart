@@ -39,7 +39,7 @@ class _MyAppState extends State<MyApp> {
                 darkTheme: ThemeData(
                     brightness: Brightness.dark
                 ),
-                home: ProductListScreen(),
+                home: HomeScreen(),
                 themeMode: themeProvider.themeMode,
 
               );

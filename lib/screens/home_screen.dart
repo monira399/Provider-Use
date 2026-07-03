@@ -28,7 +28,10 @@ class _HomeScreenState extends State<HomeScreen> {
               }, child: Icon(Icons.add)) ,
               TextButton(onPressed: (){
                 context.read<CounterProvider>().decrement();
-              }, child: Icon(Icons.remove))
+              }, child: Icon(Icons.remove)),
+              TextButton(onPressed: (){
+                context.read<CounterProvider>().reset();
+              }, child: Icon(Icons.restore)),
             ],
           ),
           FilledButton(onPressed: (){
