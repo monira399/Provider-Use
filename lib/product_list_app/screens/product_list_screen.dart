@@ -44,6 +44,7 @@ class _ProductListScreenState extends State<ProductListScreen> {
             itemCount: productListProvider.productList.length,
             gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
               crossAxisCount: 2,
+              childAspectRatio: 0.9
             ),
             itemBuilder: (context, index) {
               final Product product = productListProvider.productList[index];
@@ -54,6 +55,7 @@ class _ProductListScreenState extends State<ProductListScreen> {
                     Image.network(product.imageUrl, height: 80),
                     Text(product.name),
                     Text("\$${product.price}"),
+                    Icon(Icons.favorite_outline_outlined),
                     FilledButton(
                       onPressed: () {
                         if (alreadyInCart) {
@@ -68,10 +70,10 @@ class _ProductListScreenState extends State<ProductListScreen> {
                       },
                       child: Text(alreadyInCart ? 'Remove' : 'Add To Cart'),
                     ),
-                SizedBox(height: 20,),
-                   IconButton(onPressed: (){
-                     context.read<ThemeProvider>().toggleThemeMode();
-                   }, icon: Icon(Icons.sunny))
+                // SizedBox(height: 20,),
+                //    IconButton(onPressed: (){
+                //      context.read<ThemeProvider>().toggleThemeMode();
+                //    }, icon: Icon(Icons.sunny))
                   ]
                 ),
               );

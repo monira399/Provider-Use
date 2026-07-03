@@ -37,6 +37,7 @@ class _HomeScreenState extends State<HomeScreen> {
           FilledButton(onPressed: (){
             Navigator.push(context, MaterialPageRoute(builder: (context) => SettingsScreen()));
           }, child: Icon(Icons.navigate_next)),
+
           IconButton(onPressed: (){
             context.read<ThemeProvider>().toggleThemeMode();
           }, icon: Icon(Icons.sunny)),

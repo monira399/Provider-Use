@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:my_provider/product_list_app/screens/login_screen.dart';
 import 'package:my_provider/product_list_app/screens/product_list_screen.dart';
 import 'package:my_provider/provider/counterProvider.dart';
+import 'package:my_provider/provider/login_provider.dart';
 import 'package:my_provider/provider/product_list_provider.dart';
 import 'package:my_provider/provider/theme_provider.dart';
 import 'package:my_provider/screens/home_screen.dart';
@@ -26,12 +28,17 @@ class _MyAppState extends State<MyApp> {
         ChangeNotifierProvider(create: (_) => ThemeProvider()),
         ChangeNotifierProvider(create: (_) => CounterProvider()),
         ChangeNotifierProvider(create: (_) => ProductListProvider()),
+        ChangeNotifierProvider(create: (_) => LoginProvider()),
       ],
-          child: Consumer<ThemeProvider>(
-            builder: (context, themeProvider, _) {
+          child: Builder(
+            builder: (context) {
+
+              final themeProvider = context.watch<ThemeProvider>();
+              final loginProvider = context.watch<LoginProvider>();
+              final productListProvider = context.watch<ProductListProvider>();
+
               return MaterialApp(
                 debugShowCheckedModeBanner: false,
-                title: 'Flutter Demo',
                 theme: ThemeData(
                   brightness: Brightness.light,
                   colorSchemeSeed: Colors.green
@@ -39,9 +46,10 @@ class _MyAppState extends State<MyApp> {
                 darkTheme: ThemeData(
                     brightness: Brightness.dark
                 ),
-                home: HomeScreen(),
                 themeMode: themeProvider.themeMode,
-
+                home: loginProvider.isLoggedIn
+                        ? ProductListScreen()
+                        : LoginScreen(),
               );
             }
           ),
