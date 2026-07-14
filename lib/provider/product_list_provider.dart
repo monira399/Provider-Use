@@ -1,66 +1,106 @@
 import 'package:flutter/material.dart';
-
+import 'package:my_provider/apiServices/api_caller.dart';
+import 'package:my_provider/models/product_list_model.dart';
+import '../data/utils/urls.dart';
 import '../models/product_model.dart';
 
 class ProductListProvider extends ChangeNotifier {
-  final List<Product> _productList = [
-    Product(
-        id: 1,
-        name: 'iphone',
-        price: 120000,
-        imageUrl: 'https://plus.unsplash.com/premium_photo-1779753391100-6ed78213c5b4?q=80&w=870&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D'),
-    Product(
-        id: 2,
-        name: 'iphone',
-        price: 120000,
-        imageUrl: 'https://plus.unsplash.com/premium_photo-1779753391100-6ed78213c5b4?q=80&w=870&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D'),
-    Product(
-        id: 3,
-        name: 'iphone',
-        price: 120000,
-        imageUrl: 'https://plus.unsplash.com/premium_photo-1779753391100-6ed78213c5b4?q=80&w=870&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D'),
-    Product(
-        id: 4,
-        name: 'iphone',
-        price: 120000,
-        imageUrl: 'https://plus.unsplash.com/premium_photo-1779753391100-6ed78213c5b4?q=80&w=870&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D'),
-    Product(
-        id: 5,
-        name: 'iphone',
-        price: 120000,
-        imageUrl: 'https://plus.unsplash.com/premium_photo-1779753391100-6ed78213c5b4?q=80&w=870&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D'),
-    Product(
-        id: 6,
-        name: 'iphone',
-        price: 120000,
-        imageUrl: 'https://plus.unsplash.com/premium_photo-1779753391100-6ed78213c5b4?q=80&w=870&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D'),
 
-  ];
+  bool _getProductsInProgress = false;
 
-  final List<Product> _cartList = [];
+  bool _getSingleProductsInProgress = false;
+  bool get getSingleProductsInProgress => _getSingleProductsInProgress;
 
-  List<Product> get productList => _productList;
+  bool get getProductsInProgress => _getProductsInProgress;
 
-  List<Product> get cartList => _cartList;
+  List<ProductModel> _productList = [];
+  List<ProductModel> get productList => _productList;
+
+  ProductModel? _singleProduct;
+  ProductModel? get singleProduct => _singleProduct;
+
+   List<ProductModel> _cartList = [];
+  List<ProductModel> get cartList => _cartList;
 
   int get cartItemCount => _cartList.length;
 
+  double get totalPrice {
+    double total =0;
+     for(ProductModel product in _cartList){
+       total += product.price;
+     }
+     return total;
+  }
 
-  void addToCart(Product p) {
-    if (isAlreadyCarted(p.id)) {
-      return;
+Future<void> getProducts() async {
+  _getProductsInProgress = true;
+  notifyListeners();
+
+  try {
+    final ApiResponse response = await ApiCaller.getRequest(
+        url: Urls.productsUrl);
+
+    if (response.isSuccess) {
+      ProductListModel model = ProductListModel.fromJson(response.responseData);
+      _productList = model.products;
+    } else {
+      _productList = [];
     }
-    _cartList.add(p);
+  } on Exception catch (e) {
+    _productList = [];
+    print('Error: $e');
+  }
+
+       _getProductsInProgress = false;
+       notifyListeners();
+
+}
+
+Future<void> getSingleProduct(int id)async {
+  _getSingleProductsInProgress = true;
+  notifyListeners();
+
+  try {
+    ApiResponse response =await ApiCaller.getRequest(url: Urls.singleProductsUrl(id));
+    if(response.isSuccess){
+      _singleProduct = ProductModel.fromJson(response.responseData);
+    } else{
+      _singleProduct = null;
+    }
+  } on Exception catch (e) {
+    _singleProduct = null;
+    print('Error: $e');
+  }
+  _getSingleProductsInProgress = false;
+  notifyListeners();
+
+
+}
+
+void toggleCart(ProductModel product){
+  if(isAlreadyCarted(product.id)){
+    removeFromCart(product.id);
+  }else {
+    addToCart(product);
+  }
+}
+
+  bool addToCart(ProductModel product){
+  if(isAlreadyCarted(product.id)){
+    return false;
+  }else{
+    _cartList.add(product);
     notifyListeners();
+    return true;
+  }
   }
 
   void removeFromCart(int id) {
     _cartList.removeWhere((e) => e.id == id);
     notifyListeners();
   }
-
-  bool isAlreadyCarted(int id) {
-    return _cartList.where((e) => e.id == id).isNotEmpty;
+  
+  bool isAlreadyCarted(int id){
+  return _cartList.any((e) => e.id == id);
   }
-
 }

@@ -1,19 +1,27 @@
 import 'package:flutter/material.dart';
-import 'package:my_provider/product_list_app/screens/login_screen.dart';
-import 'package:my_provider/product_list_app/screens/product_list_screen.dart';
-import 'package:my_provider/provider/counterProvider.dart';
-import 'package:my_provider/provider/login_provider.dart';
+import 'package:my_provider/provider/favourite_provider.dart';
 import 'package:my_provider/provider/product_list_provider.dart';
 import 'package:my_provider/provider/theme_provider.dart';
-import 'package:my_provider/screens/home_screen.dart';
+import 'package:my_provider/screens/login_screen.dart';
+import 'package:my_provider/screens/product_list_screen.dart';
+import 'package:my_provider/ui/controllers/auth_controllers.dart';
 import 'package:provider/provider.dart';
 
-void main() {
-  runApp(const MyApp());
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+   bool isLoggedIn = await AuthControllers.isUserAlreadyLoggedIn();
+
+   if(isLoggedIn) {
+     await AuthControllers.getUserdata();
+   }
+  runApp(MyApp(
+    isLoggedIn: isLoggedIn,
+  ));
 }
 
 class MyApp extends StatefulWidget {
-  const MyApp({super.key});
+  final bool isLoggedIn;
+  const MyApp({super.key, required this.isLoggedIn});
 
   @override
   State<MyApp> createState() => _MyAppState();
@@ -26,19 +34,19 @@ class _MyAppState extends State<MyApp> {
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => ThemeProvider()),
-        ChangeNotifierProvider(create: (_) => CounterProvider()),
         ChangeNotifierProvider(create: (_) => ProductListProvider()),
-        ChangeNotifierProvider(create: (_) => LoginProvider()),
+        ChangeNotifierProvider(create: (_) => FavouriteProvider()),
       ],
           child: Builder(
             builder: (context) {
 
               final themeProvider = context.watch<ThemeProvider>();
-              final loginProvider = context.watch<LoginProvider>();
               final productListProvider = context.watch<ProductListProvider>();
+              final favouriteProvider = context.watch<FavouriteProvider>();
 
               return MaterialApp(
                 debugShowCheckedModeBanner: false,
+
                 theme: ThemeData(
                   brightness: Brightness.light,
                   colorSchemeSeed: Colors.green
@@ -47,7 +55,7 @@ class _MyAppState extends State<MyApp> {
                     brightness: Brightness.dark
                 ),
                 themeMode: themeProvider.themeMode,
-                home: loginProvider.isLoggedIn
+                home: widget.isLoggedIn
                         ? ProductListScreen()
                         : LoginScreen(),
               );
