@@ -54,7 +54,7 @@ class _FavouriteScreenState extends State<FavouriteScreen> {
                 ),
                 trailing: IconButton(
                   onPressed: () {
-                    context.read<ProductListProvider>().removeFromCart(product.id);
+                    context.read<FavouriteProvider>().toggleFavourite(product.id);
                   },
                   icon: const Icon(
                     Icons.delete,

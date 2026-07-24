@@ -14,7 +14,10 @@ class ProductListProvider extends ChangeNotifier {
   bool get getProductsInProgress => _getProductsInProgress;
 
   List<ProductModel> _productList = [];
-  List<ProductModel> get productList => _productList;
+  List<ProductModel> _filterProductsList =[];
+  List<ProductModel> get productList => _filterProductsList;
+
+
 
   ProductModel? _singleProduct;
   ProductModel? get singleProduct => _singleProduct;
@@ -32,6 +35,19 @@ class ProductListProvider extends ChangeNotifier {
      return total;
   }
 
+  void searchProducts(String query) {
+    if(query.isEmpty){
+      _filterProductsList = List.from(_productList);
+    }else {
+      _filterProductsList = _productList.where((product) {
+        return product.title
+            .toLowerCase()
+            .contains(query.toLowerCase());
+      }).toList();
+    }
+    notifyListeners();
+  }
+
 Future<void> getProducts() async {
   _getProductsInProgress = true;
   notifyListeners();
@@ -43,11 +59,14 @@ Future<void> getProducts() async {
     if (response.isSuccess) {
       ProductListModel model = ProductListModel.fromJson(response.responseData);
       _productList = model.products;
+      _filterProductsList = List.from(_productList);
     } else {
       _productList = [];
+      _filterProductsList =[];
     }
   } on Exception catch (e) {
     _productList = [];
+    _filterProductsList =[];
     print('Error: $e');
   }
 
